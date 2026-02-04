@@ -338,6 +338,20 @@ a {
   justify-self: start;
 }
 
+.form-status {
+  margin-top: 0.5rem;
+  font-weight: 500;
+  color: var(--primary);
+}
+
+.form-status[data-status="pending"] {
+  color: var(--muted);
+}
+
+.form-status[data-status="error"] {
+  color: #c0392b;
+}
+
 .footer {
   padding: 2rem 6vw;
   background: var(--primary);

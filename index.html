@@ -169,18 +169,18 @@
               </div>
             </div>
           </div>
-          <form class="contact-form">
+          <form class="contact-form" id="contact-form">
             <label>
               Full name
-              <input type="text" name="name" placeholder="Your name" />
+              <input type="text" name="name" placeholder="Your name" required />
             </label>
             <label>
               Email address
-              <input type="email" name="email" placeholder="you@example.com" />
+              <input type="email" name="email" placeholder="you@example.com" required />
             </label>
             <label>
               Project type
-              <select name="project">
+              <select name="project" required>
                 <option>Residential build</option>
                 <option>Commercial project</option>
                 <option>Renovation</option>
@@ -189,9 +189,15 @@
             </label>
             <label>
               Message
-              <textarea name="message" rows="4" placeholder="Tell us about your project"></textarea>
+              <textarea
+                name="message"
+                rows="4"
+                placeholder="Tell us about your project"
+                required
+              ></textarea>
             </label>
             <button type="submit" class="btn">Send request</button>
+            <p class="form-status" role="status" aria-live="polite"></p>
           </form>
         </div>
       </section>
@@ -208,5 +214,43 @@
         <a href="#contact">Contact</a>
       </div>
     </footer>
+    <script>
+      const form = document.querySelector("#contact-form");
+      const statusMessage = document.querySelector(".form-status");
+
+      const setStatus = (message, type = "success") => {
+        statusMessage.textContent = message;
+        statusMessage.dataset.status = type;
+      };
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        setStatus("Sending your request...", "pending");
+
+        const formData = new FormData(form);
+        const payload = Object.fromEntries(formData.entries());
+
+        try {
+          const response = await fetch("/api/inquiries", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.message || "Unable to send your request.");
+          }
+
+          form.reset();
+          setStatus(data.message || "Thanks! We'll be in touch soon.");
+        } catch (error) {
+          setStatus(error.message, "error");
+        }
+      });
+    </script>
   </body>
 </html>
